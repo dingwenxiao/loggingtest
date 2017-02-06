@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" monitorInterval="30" strict="true"
+	schema="Log4J-V2.2.xsd">
+	<Properties>
+		<Property name="kafka.brokers">${sys:kafka.server.address}</Property>
+		<Property name="kafka.topic.info">info</Property>
+		<Property name="kafka.topic.debug">debug</Property>
+		<Property name="kafka.topic.trace">trace</Property>
+		<Property name="kafka.topic.warn">warn</Property>
+		<Property name="kafka.topic.error">error</Property>
+		<!-- TODO prefer to use java code to configure this value if it's possible -->
+		<Property name="microserver.name.id"></Property>
+
+		<Property name="pattern.time">&quot;time&quot;:&quot;%d{yyyy-MM-dd
+			HH:mm:ss,SSS}&quot;</Property>
+		<Property name="pattern.service">&quot;service&quot;:&quot;${sys:microserver.name.id}&quot; </Property>
+		<Property name="pattern.host">&quot;host&quot;:&quot;${sys:hostname}&quot; </Property>
+		<Property name="pattern.level">&quot;level&quot;:&quot;%p&quot;</Property>
+		<Property name="pattern.file">&quot;file&quot;:&quot;%F&quot;</Property>
+		<Property name="pattern.method">&quot;method&quot;:&quot;%M&quot;</Property>
+		<Property name="pattern.thread">&quot;thread&quot;:&quot;%t&quot;</Property>
+		<Property name="pattern.line">&quot;line_Number&quot;:&quot;%L&quot; </Property>
+		<Property name="pattern.message">&quot;message&quot;:&quot;%m&quot;</Property>
+		<Property name="pattern-old">{${pattern.time},${pattern.service},${pattern.host},${pattern.level},${pattern.thread},${pattern.file},${pattern.method},${pattern.line_Number},${pattern.message}}
+		</Property>
+		<Property name="pattern">%d{ISO8601}{UTC} ${sys:microserver.name.id}
+			${sys:hostname} %p %F %M %t %L %m</Property>
+	</Properties>
+
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{ISO8601}{UTC}:%4p %t (%F:%L) - %m%n" />
+		</Console>
+		<Kafka name="Kafka" topic="test">
+			<PatternLayout pattern="%date %message" />
+			<Property name="bootstrap.servers">0.0.0.0:9092</Property>
+		</Kafka>
+	</Appenders>
+
+	<Loggers>
+		<!-- global setting -->
+		<Root level="all">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="Kafka" />
+		</Root>
+		<!-- Make sure to not let org.apache.kafka log to a Kafka appender on DEBUG 
+			level for avoiding recursive logging -->
+		<Logger name="org.apache.kafka" level="info"/>
+			
+	</Loggers>
+</Configuration>  
